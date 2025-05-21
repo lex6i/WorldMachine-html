@@ -8,6 +8,8 @@ export default class UI {
         this.updateStatus();
         this.updateButtons();
         this.addListeners();
+        this.initializeAnimations();
+        this.initializeHistory();
     }
 
     loadDomElements() {
@@ -34,6 +36,11 @@ export default class UI {
         dom.matrixData = document.getElementById("matrix-data");
         dom.matrixDetails = document.querySelector(".matrix-container details");
         dom.matrixCanvas = document.getElementById("matrix3d");
+    }
+
+    updateUI(buttons=false){
+        this.updateStatus();
+        this.updateButtons(buttons);
     }
 
 

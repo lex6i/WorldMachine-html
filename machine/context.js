@@ -14,17 +14,6 @@ export default class Context {
         }
 
         this.ui = new UI(this);
-
-        //TODO: Move matrix to matrix.js
-        this.matrix = {
-            scene: null,
-            camera: null,
-            renderer: null,
-            points: null,
-            animationId: null,
-        };
-
-        this.ui.initializeAnimations();
     }
 
     /*
@@ -51,16 +40,13 @@ export default class Context {
             });
         });
 
-        ui.initializeHistory();
-
 
         state.initialized = true;
         console.log("Machine initialized");        
 
         ui.matrixAnimation.start();
 
-        ui.updateButtons();
-        ui.updateStatus();
+        ui.updateUI();
 
         // Start Zero Gravity Mode
         this.startZeroGravity();
@@ -75,8 +61,7 @@ export default class Context {
         state.mode = null;
         state.round = 0;
 
-        ui.updateButtons(true);
-        ui.updateStatus();
+        ui.updateUI(true);
 
         ui.addToHistory("ZONE", `Activated zone: ${AREAS[state.area].name}`);
 
@@ -85,7 +70,7 @@ export default class Context {
         await ui.updateConsole(`Activated new zone: ${AREAS[state.area].name}`, ">");
         await ui.updateConsole(`Starting question rounds for this zone (modes will be drawn randomly)...`, ">");
         
-        ui.updateButtons();
+        ui.updateUI();
     }
 
     async generateQuestions(){
@@ -241,7 +226,6 @@ export default class Context {
         await this.ui.updateConsole("Zero Gravity phase complete. Generate the first zone.", ">");
 
         this.ui.asciiAnimation.start();
-        this.ui.updateStatus();
-        this.ui.updateButtons();
+        this.ui.updateUI();
     }
 }
