@@ -60,8 +60,10 @@ export class MatrixAnimation {
         const matrix = this.matrix;
 
         // Clear previous canvas if any
-        while (dom.matrixCanvas.firstChild) {
-            dom.matrixCanvas.removeChild(dom.matrixCanvas.firstChild);
+        if (dom.matrixCanvas != null) {  
+            while (dom.matrixCanvas.firstChild) {
+                dom.matrixCanvas.removeChild(dom.matrixCanvas.firstChild);
+            }
         }
 
 

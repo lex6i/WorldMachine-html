@@ -103,7 +103,7 @@ export default class Context {
     }
 
     generateHint() {
-        this.ui.showHint(HINTS[Math.floor(Math.random() * HINTS.length)]);
+        this.ui.addHint(HINTS[Math.floor(Math.random() * HINTS.length)]);
     }
 
     /*

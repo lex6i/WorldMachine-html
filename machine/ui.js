@@ -12,6 +12,9 @@ export default class UI {
         this.initializeHistory();
     }
 
+     /*====
+     Initialization
+     ====*/
     loadDomElements() {
         this.domElements = {};
         const dom = this.domElements;
@@ -30,13 +33,58 @@ export default class UI {
         dom.macromatrixHintDiv = document.getElementById("macromatrix-hint");
         dom.historyLog = document.getElementById("history-log");
         dom.asciiAnimationDiv = document.getElementById("ascii-animation");
-        dom.matrix3dContainer = document.getElementById("matrix3d");
+        dom.matrix2dContainer = document.getElementById("matrix3d");
         dom.matrixInput = document.getElementById("matrix-input");
         dom.matrixSubmit = document.getElementById("matrix-submit");
         dom.matrixData = document.getElementById("matrix-data");
         dom.matrixDetails = document.querySelector(".matrix-container details");
         dom.matrixCanvas = document.getElementById("matrix3d");
     }
+
+    initializeHistory(){
+        const dom = this.domElements;
+        dom.consoleOutput.innerHTML = "";
+        dom.historyLog.innerHTML = "";
+        dom.currentAreaDiv.style.display = "none";
+        dom.areaDescriptionDiv.style.display = "none";
+        dom.macromatrixHintDiv.style.display = "none";
+        dom.matrixData.innerHTML = "";
+    }
+
+    initializeAnimations(){
+        this.asciiAnimation = new AsciiAnimation(this);
+        this.matrixAnimation = new MatrixAnimation(this);
+    }
+
+    addListeners() {
+        const dom = this.domElements;
+        const context = this.context;
+
+        dom.btnInitialize.addEventListener("click", () => {
+            context.initialize();
+        });
+        dom.btnArea.addEventListener("click", () => {
+            context.generateZone();
+        });
+        dom.btnQuestion.addEventListener("click", () => {
+            context.generateQuestions();
+        });
+        dom.btnHint.addEventListener("click", () => {
+            context.generateHint();
+        });
+        dom.matrixSubmit.addEventListener("click", function(){
+            context.addMatrixData(dom.matrixInput.value.trim()); 
+        });
+        dom.matrixInput.addEventListener("keypress", function(e){
+            if(e.key === "Enter"){
+                context.addMatrixData(dom.matrixInput.value.trim()); 
+            }
+        });
+    }
+
+    /*====
+    UI Updates
+    ====*/
 
     updateUI(buttons=false){
         this.updateStatus();
@@ -118,32 +166,6 @@ export default class UI {
             isLoading;
         }
 
-    addListeners() {
-        const dom = this.domElements;
-        const context = this.context;
-
-        dom.btnInitialize.addEventListener("click", () => {
-            context.initialize();
-        });
-        dom.btnArea.addEventListener("click", () => {
-            context.generateZone();
-        });
-        dom.btnQuestion.addEventListener("click", () => {
-            context.generateQuestions();
-        });
-        dom.btnHint.addEventListener("click", () => {
-            context.generateHint();
-        });
-        dom.matrixSubmit.addEventListener("click", function(){
-            context.addMatrixData(dom.matrixInput.value.trim()); 
-        });
-        dom.matrixInput.addEventListener("keypress", function(e){
-            if(e.key === "Enter"){
-                context.addMatrixData(dom.matrixInput.value.trim()); 
-            }
-        });
-    }
-
     async updateConsole(text, prompt="", classes=[]){
         const line = document.createElement("div");
         const promptSpan = document.createElement("span");
@@ -172,6 +194,7 @@ export default class UI {
         textSpan.classList.remove("typing");
         line.classList.add("finished-typing");
     }
+
 
     addToHistory(type, content){
         const dom = this.domElements;
@@ -244,6 +267,17 @@ export default class UI {
         dom.historyLog.scrollTop = dom.historyLog.scrollHeight;
     }
 
+    addHint(hintText){
+        const dom = this.domElements;
+        dom.macromatrixHintDiv.textContent = `[Macromatrix]: ${hintText}`;
+        dom.macromatrixHintDiv.style.display = "block";
+        this.addToHistory("HINT", hintText);
+    }
+
+
+    /*====
+    Utility
+    ====*/
     getCssVariable(varName) {
         return window.getComputedStyle(document.body)
             .getPropertyValue(varName);
@@ -262,27 +296,5 @@ export default class UI {
         dom.areaDescriptionDiv.textContent = `Description: ${areaInfo.description}`;
         dom.areaDescriptionDiv.style.borderColor = zoneColor;
         dom.areaDescriptionDiv.style.display = "block";
-    }
-
-    showHint(hintText){
-        const dom = this.domElements;
-        dom.macromatrixHintDiv.textContent = `[Macromatrix]: ${hintText}`;
-        dom.macromatrixHintDiv.style.display = "block";
-        this.addToHistory("HINT", hintText);
-    }
-
-    initializeHistory(){
-        const dom = this.domElements;
-        dom.consoleOutput.innerHTML = "";
-        dom.historyLog.innerHTML = "";
-        dom.currentAreaDiv.style.display = "none";
-        dom.areaDescriptionDiv.style.display = "none";
-        dom.macromatrixHintDiv.style.display = "none";
-        dom.matrixData.innerHTML = "";
-    }
-
-    initializeAnimations(){
-        this.asciiAnimation = new AsciiAnimation(this);
-        this.matrixAnimation = new MatrixAnimation(this);
     }
 }
