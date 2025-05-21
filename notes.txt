@@ -1,0 +1,20 @@
+* Scanline effect is not working
+* Style.css and Script.js are not being used
+* css Textglow and matrixglow, are they used somewhere?
+* Does get random element and get random key not respect previouse used elements?
+
+TODO:
+* Add the history to the machine
+* Add the matrix ascii animation
+* Add the three js animation
+* Center when mobile view
+* matrix history reversed?
+
+*should the same zone be used twice in a row?
+
+
+how would I want to use the questions class?
+```
+const questions = new Questions();
+
+questions.

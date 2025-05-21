@@ -1,0 +1,905 @@
+:root {
+    /* Color Scheme */
+    --bg-color: #0a0a0a; /* Background color */
+    --text-color: #e0e0e0; /* Main text color */
+    --accent-color: #ff6bce; /* Pink accent */
+    --highlight-color: #ff9ad5; /* Lighter pink */
+    --secondary-color: #ffd166; /* Yellow for contrast */
+    --dark-accent: #6a0dad; /* Deep purple */
+    --button-bg: #1a1a1a; /* Button background */
+    --border-color: var(--accent-color); /* Border color */
+    --console-bg: rgba(15, 15, 15, 0.9); /* Console background */
+    --question-color: #ff9ad5; /* Question text color */
+    --area-color: #ff6bce; /* Color related to the zone */
+    --mode-color: #ffd166; /* Color related to the mode */
+    --matrix-color: #00ff41; /* Green matrix color */
+
+    /* Colors for individual zones (for JS use) */
+    --environment-color: #4caf50;
+    --physics-color: #2196f3;
+    --interactions-color: #ff9800;
+    --economy-color: #9c27b0;
+    --history-color: #607d8b;
+    --time-color: #00bcd4;
+    --lore-color: #e91e63;
+    --energy-color: #ffeb3b; /* Added color for Energy */
+    --tech-color: #3f51b5;
+    --anomalies-color: #8bc34a;
+    --affects-color: #ff5722;
+
+    /* Layout & Effects */
+    --border-radius: 6px; /* Corner rounding radius */
+    --glow-intensity: 0 0 10px; /* Glow intensity */
+}
+
+/* --- Global Styles --- */
+* {
+    box-sizing: border-box; /* Box model */
+    font-family: "VT323", monospace; /* Default font */
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6; /* Line spacing */
+    padding: 20px; /* Body inner margin */
+    max-width: 1400px; /* Maximum content width */
+    margin: 0 auto; /* Center content */
+    font-size: 20px; /* Default font size */
+    text-shadow: var(--glow-intensity) rgba(255, 107, 206, 0.2); /* Slight text glow */
+    min-height: 100vh; /* Minimum body height */
+    /* Subtle background gradient */
+    background-image: radial-gradient(
+        circle at 10% 20%,
+        rgba(255, 107, 206, 0.05) 0%,
+        transparent 20%
+        ),
+        radial-gradient(
+        circle at 90% 80%,
+        rgba(106, 13, 173, 0.05) 0%,
+        transparent 20%
+        );
+    /* Grid layout for main containers */
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 20px; /* Gap between columns */
+}
+
+/* --- Media Query for smaller screens (single-column layout) --- */
+@media (max-width: 1024px) {
+    body {
+        grid-template-columns: 1fr; /* Single column */
+    }
+}
+
+/* Round counter */
+#counter-rounds {
+  font-weight: 400;
+  font-family: "Genos", sans-serif;
+  letter-spacing: 1px;
+}
+
+/* --- 
+Main Container Styles (left column) 
+--- */
+
+.container {
+    border: 2px solid var(--accent-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 0 20px rgba(255, 107, 206, 0.3); /* Glow around the container */
+    background-color: var(--console-bg); /* Semi-transparent background */
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(2px); /* Blur background behind the container */
+    grid-column: 1; /* Placement in the first grid column */
+}
+
+/* --- Page Header --- */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgba(106, 13, 173, 0.3),
+        transparent
+    ); /* Gradient background */
+    border-radius: var(--border-radius);
+    border-bottom: 1px solid var(--accent-color);
+    position: relative;
+    overflow: hidden; /* Hide overflowing elements */
+}
+
+/* Animated line in the header */
+header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--accent-color),
+      transparent
+    );
+    animation: headerGlow 3s infinite; /* Glow animation */
+}
+
+
+@keyframes headerGlow {
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+h1 {
+    font-family: "Genos", sans-serif; /* Different font for H1 */
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(255, 107, 206, 0.7);
+    margin: 0;
+    text-transform: uppercase; /* Uppercase letters */
+    position: relative;
+  }
+
+.subtitle {
+    font-family: "VT323", monospace;
+    font-size: 1.4rem;
+    color: var(--highlight-color);
+    margin-top: 5px;
+    letter-spacing: 1px;
+}
+
+h2 {
+    font-size: 1.6rem;
+    color: var(--highlight-color);
+    margin: 25px 0 15px 0;
+    border-bottom: 1px solid var(--accent-color);
+    padding-bottom: 6px;
+    font-family: "Genos", sans-serif;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+/* --- Status Bar --- */
+.status-bar {
+    display: flex;
+    justify-content: space-between; /* Distribute elements */
+    flex-wrap: wrap; /* Wrap on smaller screens */
+    gap: 15px;
+    background-color: var(--button-bg);
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    margin: 25px 0;
+    font-size: 1rem;
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 10px rgba(255, 107, 206, 0.2);
+}
+
+/* Single status item (LED + text) */
+.status-item {
+    display: flex;
+    align-items: center;
+    color: var(--text-color);
+}
+
+/* Text in status item */
+.status-item span {
+    margin-left: 8px;
+    font-family: "Genos", sans-serif;
+    letter-spacing: 1px;
+}
+
+/* Status LED */
+.status-led {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%; /* Circle */
+    margin-right: 8px;
+    background-color: #ff3d3d; /* Default red (inactive) */
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.7); /* Red glow */
+    flex-shrink: 0; /* Prevent shrinking */
+    transition: all 0.4s ease; /* Smooth color/shadow transition */
+    position: relative;
+}
+
+/* Additional LED border for aesthetics */
+.status-led::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    pointer-events: none; /* Ignore mouse events */
+}
+
+/* Active LED style */
+.status-led.active {
+    background-color: #3dff3d; /* Green */
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.8); /* Green glow */
+    animation: pulse 1.5s infinite; /* Pulsing animation */
+}
+
+/* Active LED pulsing animation */
+@keyframes pulse {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+
+
+/* --- Control Panel (Main Buttons) --- */
+.control-panel {
+    display: flex;
+    flex-wrap: wrap; /* Wrap buttons on smaller screens */
+    gap: 12px;
+    margin-bottom: 20px;
+    justify-content: center; /* Center buttons */
+}
+
+/* --- Button Styles --- */
+button {
+  background-color: var(--button-bg);
+  color: var(--text-color);
+  border: 1px solid var(--accent-color);
+  border-radius: var(--border-radius);
+  padding: 8px 16px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 180px; /* Minimum width */
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 1px;
+}
+
+/* Extra border for hover effect */
+button::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 1px solid var(--accent-color);
+  border-radius: var(--border-radius);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Hover effect for active buttons */
+button:hover:not(:disabled) {
+    background-color: var(--dark-accent); /* Background change */
+    color: var(--highlight-color); /* Text color change */
+    text-shadow: 0 0 8px var(--highlight-color); /* Text glow */
+    box-shadow: 0 0 15px rgba(255, 107, 206, 0.5); /* Button glow */
+}
+
+/* Activate extra border and animation on hover */
+button:hover:not(:disabled)::before {
+    opacity: 1;
+    animation: buttonBorderPulse 2s infinite;
+}
+
+/* Border pulsing animation */
+@keyframes buttonBorderPulse {
+    0%,
+    100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* Style for disabled buttons */
+button:disabled {
+    opacity: 0.3; /* Reduced visibility */
+    cursor: not-allowed; /* Not-allowed cursor */
+    border-color: #444;
+    color: #555;
+}
+
+/* --- ASCII Animation --- */
+#ascii-animation {
+  font-family: "VT323", monospace;
+  white-space: pre; /* Preserve whitespace (spaces, newlines) */
+  color: var(--highlight-color);
+  font-size: 1.2rem;
+  line-height: 1.1;
+  text-align: center;
+  margin: 15px auto 25px auto;
+  height: 30px; /* Fixed height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-shadow: 0 0 8px var(--highlight-color);
+}
+
+/* --- Output Console --- */
+.console {
+  background-color: var(--console-bg);
+  border: 1px solid var(--accent-color);
+  border-radius: var(--border-radius);
+  padding: 15px;
+  height: 350px; /* Fixed height */
+  overflow-y: auto; /* Scrollbar */
+  margin-bottom: 20px;
+  position: relative;
+  font-family: "VT323", monospace;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7); /* Inner shadow */
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+/* Console scrollbar styles */
+.console::-webkit-scrollbar {
+  width: 8px;
+}
+.console::-webkit-scrollbar-track {
+  background: #111;
+}
+.console::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: var(--border-radius);
+}
+.console::-webkit-scrollbar-thumb:hover {
+  background: var(--highlight-color);
+}
+
+/* Single line in the console */
+.console-line {
+  margin-bottom: 10px;
+  display: flex;
+  user-select: none; /* Text cannot be selected by default (for typing effect) */
+  animation: fadeIn 0.3s ease; /* Fade-in animation */
+}
+
+/* Line fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Allow text selection after typing is finished */
+.console-line.finished-typing {
+  user-select: text;
+}
+
+/* Prompt (e.g., '>') in the console */
+.console-prompt {
+  color: var(--accent-color);
+  margin-right: 10px;
+  flex-shrink: 0; /* Prevents the prompt from shrinking */
+}
+
+/* Text in the console line */
+.console-text {
+  flex: 1; /* Takes up the rest of the available space */
+  white-space: pre-wrap; /* Wrap text */
+  word-break: break-word; /* Break long words */
+}
+
+/* Special style for question text */
+.question-text {
+  color: var(--question-color);
+  text-shadow: 0 0 8px rgba(255, 154, 213, 0.5);
+}
+
+/* Blinking cursor effect during typing */
+.typing::after {
+  content: "▋"; /* Cursor character */
+  display: inline-block;
+  animation: blink 1s step-end infinite; /* Blinking animation */
+  color: var(--highlight-color);
+  margin-left: 2px;
+  vertical-align: baseline;
+}
+
+/* Cursor blinking animation */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* --- Info Blocks (Zone Info, Zone Description, Hint) --- */
+.area-info,
+.hint,
+.area-description {
+  border-left: 3px solid; /* Left border */
+  padding: 10px 15px;
+  margin: 20px 0;
+  border-radius: 0 var(--border-radius) var(--border-radius) 0; /* Round only right corners */
+  background-color: rgba(30, 30, 30, 0.6);
+  font-style: italic; /* Italic */
+  animation: fadeIn 0.5s ease; /* Fade-in animation */
+}
+
+.area-info {
+  /* Displays the zone name */
+  border-color: var(--area-color); /* Default color, changed by JS */
+  color: var(--highlight-color);
+  font-style: normal; /* Name doesn't need to be italic */
+  font-weight: bold;
+}
+
+.area-description {
+  /* Displays the zone description */
+  border-color: var(--area-color); /* Default color, changed by JS */
+  color: var(--text-color); /* Normal text color for description */
+  font-size: 0.95rem;
+  line-height: 1.4;
+  font-style: normal;
+}
+
+.hint {
+  /* Displays the hint */
+  border-color: var(--secondary-color);
+  color: var(--secondary-color);
+}
+
+/* --- Session History Section --- */
+.history {
+  border-top: 1px dashed var(--accent-color); /* Separator line */
+  padding-top: 20px;
+  margin-top: 30px;
+}
+
+/* History log container */
+#history-log {
+  max-height: 300px; /* Maximum height */
+  overflow-y: auto; /* Scrollbar */
+  padding-right: 10px; /* Space for scrollbar */
+}
+
+/* History scrollbar styles */
+#history-log::-webkit-scrollbar {
+  width: 6px;
+}
+#history-log::-webkit-scrollbar-track {
+  background: #111;
+}
+#history-log::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+#history-log::-webkit-scrollbar-thumb:hover {
+  background: var(--highlight-color);
+}
+
+/* Single history item */
+.history-item {
+  margin-bottom: 12px;
+  padding: 10px;
+  border-left: 2px solid var(--accent-color); /* Default color, changed by JS */
+  background-color: rgba(25, 25, 25, 0.5);
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  font-size: 1rem; /* Smaller font than console */
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  transition: all 0.3s ease; /* Smooth transition for hover */
+  animation: fadeIn 0.5s ease;
+}
+
+/* Hover effect for history item */
+.history-item:hover {
+  background-color: rgba(40, 40, 40, 0.6);
+  transform: translateX(5px); /* Slight shift to the right */
+}
+
+/* Text within history item */
+.history-item .console-text {
+  color: var(--text-color);
+  margin-left: 10px;
+  flex: 1;
+}
+
+/* Category badge (e.g., 'QUESTION', 'ZONE') */
+.history-item .category-badge {
+    order: -1; /* Display as the first element */
+    margin-right: 10px;
+    background-color: var(
+      --accent-color
+    ); /* Default color, can be changed by JS */
+    color: var(--bg-color);
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    border-radius: var(--border-radius);
+    font-family: "Genos", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- 
+Matrix Container Styles (right column) 
+--- */
+
+.matrix-container {
+    border: 2px solid var(--matrix-color);
+    border-radius: var(--border-radius);
+    padding: 0; /* Padding removed, it's in <details> */
+    margin-bottom: 25px;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); /* Green glow */
+    background-color: rgba(0, 10, 5, 0.9); /* Dark green background */
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(2px); /* Blur background behind the container */
+    grid-column: 2; /* Placement in the second grid column */
+}
+
+
+/* Styling for the <summary> element (Matrix section title) */
+.matrix-container summary {
+  padding: 20px; /* Added padding here */
+  cursor: pointer;
+  outline: none;
+  list-style: none; /* Hide default marker */
+  text-align: center;
+  font-family: "VT323", monospace;
+  font-size: 1.8rem;
+  color: var(--matrix-color);
+  text-shadow: 0 0 10px var(--matrix-color);
+  letter-spacing: 2px;
+  border-bottom: 1px dashed rgba(0, 255, 65, 0.3); /* Separator line when collapsed */
+}
+.matrix-container details[open] summary {
+  border-bottom: none; /* Remove line when expanded */
+}
+
+/* Styling for the default <details> marker (if browser adds one) */
+.matrix-container summary::-webkit-details-marker {
+  display: none;
+}
+.matrix-container summary::marker {
+  /* Standard way */
+  display: none;
+}
+
+/* Container for <details> content */
+.matrix-content {
+  padding: 20px; /* Padding for the content */
+  border-top: 1px solid var(--matrix-color); /* Separator line from summary */
+  display: flex;
+  flex-direction: column;
+  /* Set height for the content when <details> is open */
+  /* Can be adjusted or removed if height should be auto */
+  height: calc(100vh - 120px); /* Example height, adjust as needed */
+  min-height: 500px; /* Minimum content height */
+}
+
+/* --- Media Query for matrix container on smaller screens --- */
+@media (max-width: 1024px) {
+  .matrix-container {
+    grid-column: 1; /* In single-column layout, occupies the first (and only) column */
+    /* Removed height: auto and position: static - unnecessary for <details> */
+  }
+  .matrix-content {
+    height: auto; /* Auto height on smaller screens */
+    min-height: 400px;
+  }
+}
+
+/* --- Container for 3D Visualization (Three.js) --- */
+#matrix3d {
+  flex-grow: 1; /* Stretches to fill available space */
+  width: 100%;
+  /* min-height removed, height managed by .matrix-content */
+  border: 1px solid var(--matrix-color);
+  margin-bottom: 15px;
+  /* Three.js will create its <canvas> element here */
+}
+
+/* --- Matrix Controls (Input + Button) --- */
+.matrix-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.matrix-input {
+  flex-grow: 1; /* Input takes most space */
+  background: rgba(0, 20, 10, 0.7);
+  border: 1px solid var(--matrix-color);
+  color: var(--matrix-color);
+  padding: 10px;
+  font-family: "VT323", monospace;
+  font-size: 1.2rem;
+}
+
+.matrix-input:focus {
+  outline: none; /* Remove default focus outline */
+  box-shadow: 0 0 10px var(--matrix-color); /* Glow on focus */
+}
+
+.matrix-submit {
+  background: rgba(0, 30, 15, 0.7);
+  border: 1px solid var(--matrix-color);
+  color: var(--matrix-color);
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: all 0.3s; /* Smooth transition */
+}
+
+.matrix-submit:hover {
+  background: var(--matrix-color);
+  color: black; /* Change text color for contrast */
+  text-shadow: 0 0 5px white; /* Slight white text glow */
+}
+
+/* --- Matrix Data Display Area --- */
+.matrix-data {
+  max-height: 200px; /* Max height, scrollbar appears */
+  overflow-y: auto; /* Vertical scrollbar only when needed */
+  border: 1px solid var(--matrix-color);
+  padding: 10px;
+  background: rgba(0, 10, 5, 0.5);
+  font-size: 0.9rem; /* Smaller font */
+  color: var(--matrix-color);
+  /* flex-grow: 0; */ /* Prevents excessive stretching */
+  flex-shrink: 0; /* Prevents shrinking */
+}
+
+/* Scrollbar style for Webkit (Chrome, Safari) */
+.matrix-data::-webkit-scrollbar {
+  width: 5px;
+}
+
+.matrix-data::-webkit-scrollbar-thumb {
+  background: var(--matrix-color);
+}
+
+
+/* ---
+Footer Styles
+--- */
+
+footer {
+  text-align: center;
+  margin-top: 40px;
+  padding: 15px 0;  
+  font-size: 0.9rem;
+  color: var(--text-color);
+  opacity: 0.7; /* Slightly transparent */
+  border-top: 1px dashed var(--accent-color); /* Separator line */
+  font-family: "Genos", sans-serif;
+  letter-spacing: 1px;
+}
+
+
+/* ---
+Effects
+--- */
+
+/* Class for general text glow */
+.glow {
+  animation: glow 2s infinite alternate ease-in-out;
+  display: inline-block;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px var(--highlight-color);
+  }
+  to {
+    text-shadow: 0 0 15px var(--highlight-color),
+      0 0 25px var(--accent-color);
+  }
+}
+
+/* Class for green matrix glow */
+.matrix-glow {
+  animation: matrixGlow 2s infinite alternate ease-in-out;
+  display: inline-block;
+}
+
+@keyframes matrixGlow {
+  from {
+    text-shadow: 0 0 5px var(--matrix-color);
+  }
+  to {
+    text-shadow: 0 0 15px var(--matrix-color),
+      0 0 25px var(--matrix-color);
+  }
+}
+
+/* --- Scanlines Effect (lines like an old monitor) --- */
+.scanlines {
+  position: fixed; /* Covers the entire window */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 10, 0) 50%,
+    rgba(0, 0, 0, 0.15) 50%
+  );
+  background-size: 100% 4px; /* Line height */
+  z-index: 100; /* Below main content */
+  pointer-events: none; /* Ignore mouse events */
+  opacity: 0.5; /* Subtle effect */
+  animation: scanline-animation 30s linear infinite; /* Line scrolling animation */
+}
+
+@keyframes scanline-animation {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100vh;
+  } /* Scrolls background down */
+}
+
+
+/* --- Styles for colored left borders in history ('zone-*' classes) --- */
+/* These classes will be added dynamically to .history-item */
+.zone-environment {
+  border-left-color: var(--environment-color) !important;
+}
+.zone-physics {
+  border-left-color: var(--physics-color) !important;
+}
+.zone-interactions {
+  border-left-color: var(--interactions-color) !important;
+}
+.zone-economy {
+  border-left-color: var(--economy-color) !important;
+}
+.zone-history {
+  border-left-color: var(--history-color) !important;
+}
+.zone-time {
+  border-left-color: var(--time-color) !important;
+}
+.zone-lore {
+  border-left-color: var(--lore-color) !important;
+}
+.zone-energy {
+  border-left-color: var(--energy-color) !important;
+}
+.zone-tech {
+  border-left-color: var(--tech-color) !important;
+}
+.zone-anomalies {
+  border-left-color: var(--anomalies-color) !important;
+}
+.zone-affects {
+  border-left-color: var(--affects-color) !important;
+}
+
+/* --- Additional Media Queries for Responsiveness --- */
+@media screen and (max-width: 1024px) {
+  /* Adjustments for tablets */
+  .container {
+    padding: 15px;
+    max-width: 95%;
+  }
+
+  .control-panel {
+    gap: 10px;
+  }
+
+  button {
+    min-width: 160px;
+    font-size: 1.1rem;
+    padding: 7px 12px;
+  }
+
+  .status-bar {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  /* Adjustments for smaller tablets/larger phones */
+  body {
+    font-size: 18px;
+    padding: 15px;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+  }
+
+  button {
+    min-width: 140px;
+    font-size: 1rem;
+    padding: 6px 10px;
+  }
+
+  .console {
+    height: 300px;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  .status-bar {
+    gap: 8px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* Adjustments for mobile phones */
+  body {
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  /* Buttons take full width in a column */
+  .control-panel {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .console {
+    height: 280px;
+  }
+
+  /* Status bar items stack vertically */
+  .status-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .status-item {
+    margin-bottom: 5px;
+  }
+}
