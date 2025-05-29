@@ -53,11 +53,25 @@ export class MatrixAnimation {
             points: null,
             animationId: null,
         };
+
+        this.pointcloud = {
+            geometry: null,
+            lines: [],
+            points: [],
+            activePoints: [],
+            pointConnections: [],
+            numPoints: 5000,
+            defaultSize: 0.01,
+            activeSize: 0.2,
+            rotationX: 0,
+            rotationY: 0,
+        }
     }
 
     start() {
         const dom = this.ui.domElements;
         const matrix = this.matrix;
+        const pointcloud = this.pointcloud;
 
         // Clear previous canvas if any
         if (dom.matrixCanvas != null) {  
@@ -83,7 +97,7 @@ export class MatrixAnimation {
                 0.1,
                 1000
             );
-            matrix.camera.position.z = 5;
+            matrix.camera.position.z = 7;
 
             // Initialize Renderer
             matrix.renderer = new THREE.WebGLRenderer({
@@ -93,30 +107,71 @@ export class MatrixAnimation {
             dom.matrixCanvas.appendChild(matrix.renderer.domElement);
 
             // Initialize Geometry
-            const geometry = new THREE.BufferGeometry();
+            this.pointcloud.geometry = new THREE.BufferGeometry();
+            const geometry = this.pointcloud.geometry;
             const vertices = [];
-            const numPoints = 5000;
+            const numPoints = this.pointcloud.numPoints;
+
+            const mainColor = new THREE.Color(this.ui.getCssVariable("--matrix-color") || "#00ff41");
+            
+            const colors = new Float32Array(numPoints * 3);
+            const sizes = new Float32Array(numPoints);
+
             for (let i = 0; i < numPoints; i++) {
-                vertices.push(
-                    (Math.random() - 0.5) * 10,
-                    (Math.random() - 0.5) * 10,
-                    (Math.random() - 0.5) * 10
-                );
+                const x = (Math.random() - 0.5) * 10;
+                const y = (Math.random() - 0.5) * 10;
+                const z = (Math.random() - 0.5) * 10;
+
+                vertices.push(x, y, z);
+
+                pointcloud.points.push(x, y, z);
+
+                const color = mainColor;
+                colors[i*3] = color.r;
+                colors[i*3+1] = color.g;
+                colors[i*3+2] = color.b;
+
+                sizes[i] = this.pointcloud.defaultSize;
             }
+
             geometry.setAttribute(
                 "position",
                 new THREE.Float32BufferAttribute(vertices, 3)
-            )
+            );
+            geometry.setAttribute(
+                "color",
+                new THREE.Float32BufferAttribute(colors, 3)
+            );
+            geometry.setAttribute(
+                "size",
+                new THREE.Float32BufferAttribute(sizes, 1)
+            );
 
-            // Initialize Material
-            const matrixColorCSS = this.ui.getCssVariable("--matrix-color") || "#00ff41";
-            const material = new THREE.PointsMaterial({
-                color: matrixColorCSS,
-                size: 0.05,
-                transparent: true,
-                opacity: 0.7,
-                sizeAttenuation: true,
+            // Custom shader material
+            const material = new THREE.ShaderMaterial({
+                vertexShader: `
+                    attribute float size;
+                    attribute vec3 color;
+                    varying vec3 vColor;
+                    uniform float pixelRatio;
+
+                    void main() {
+                        vColor = color;
+                        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                        gl_PointSize = size * (300.0 / -mvPosition.z);
+                        gl_Position = projectionMatrix * mvPosition;
+                    }
+                `,
+                fragmentShader: `
+                    varying vec3 vColor;
+
+                    void main() {
+                        gl_FragColor = vec4(vColor, 1.0);
+                    }
+                `,
+                transparent: true
             });
+            
 
             // Initialize Points
             matrix.points = new THREE.Points(geometry, material);
@@ -126,15 +181,30 @@ export class MatrixAnimation {
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
             matrix.scene.add(ambientLight);
 
+            let rotationX = 0;
+            let rotationY = 0;
+
             // Animation Function
             function animate() {
                 if (matrix.animationId)
                     cancelAnimationFrame(matrix.animationId);
                 matrix.animationId = requestAnimationFrame(animate);
                 if (matrix.points) {
-                    matrix.points.rotation.x += 0.001;
-                    matrix.points.rotation.y += 0.002;
+                    rotationX += 0.001;
+                    rotationY += 0.002;
+                    matrix.points.rotation.x = rotationX;
+                    matrix.points.rotation.y = rotationY;
                 }
+
+                if (pointcloud.lines) {
+                    console.log("Updating lines");
+                    for (let line of pointcloud.lines) {
+                        line.rotation.x = rotationX;
+                        line.rotation.y = rotationY;
+                    }
+                }
+
+
                 if (matrix.renderer && matrix.scene && matrix.camera) {
                     matrix.renderer.render(
                         matrix.scene,
@@ -164,6 +234,24 @@ export class MatrixAnimation {
         } catch (error) {
             console.error("Error initializing matrix viewer:", error);
         }
+    }
+
+    addLine(point1, point2, color=0xffffff) {
+        const points = [];
+        points.push(point1[0], point1[1], point1[2]);
+        points.push(point2[0], point2[1], point2[2]);
+
+        console.log(points);
+
+        const geometry = new THREE.BufferGeometry();
+        const material = new THREE.LineBasicMaterial({ color: color, linewidth: 1 });
+
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(points, 3));
+
+        const line = new THREE.Line(geometry, material);
+
+        this.pointcloud.lines.push(line);
+        this.matrix.scene.add(line);
     }
 
     stop() {

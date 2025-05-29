@@ -195,12 +195,56 @@ export default class UI {
         line.classList.add("finished-typing");
     }
 
+    updateMatrixAnimation(color) {
+        const pointcloud = this.matrixAnimation.pointcloud; 
+        const r = Math.floor(Math.random() * pointcloud.numPoints);
 
-    addToHistory(type, content){
+        /* Update color of a point*/
+        const c = pointcloud.geometry.attributes.color;
+        color = new THREE.Color(this.getCssVariable(color));
+        for (let i = 0; i < c.count; i++) {
+            if (i == r) {
+                c.array[i * 3] = color.r;
+                c.array[i * 3 + 1] = color.g;
+                c.array[i * 3 + 2] = color.b;
+            }
+        }
+
+        /* Update size of a point*/
+        const s = pointcloud.geometry.attributes.size;
+        for (let i = 0; i < s.count; i++) {
+            if (i == r) {
+                s.array[i] = pointcloud.activeSize;
+            }
+        }
+
+        /* Update pointcloud*/
+        c.needsUpdate = true;
+        s.needsUpdate = true;
+
+        /* Update lines*/
+        pointcloud.activePoints.push(
+            [
+                pointcloud.points[r*3],
+                pointcloud.points[r*3+1],
+                pointcloud.points[r*3+2]
+            ]
+        );
+        if (pointcloud.activePoints.length > 1) {
+            this.matrixAnimation.addLine(
+                pointcloud.activePoints[pointcloud.activePoints.length-1], 
+                pointcloud.activePoints[pointcloud.activePoints.length-2],
+                color
+            );
+        }
+    }
+
+
+    addToHistory(type, content) {
         const dom = this.domElements;
         const context = this.context;
         const state = context.state;
-        
+
         //Pick Color
         let badgeColor =
             state.mode === "ZERO_GRAVITY" ?
@@ -267,7 +311,7 @@ export default class UI {
         dom.historyLog.scrollTop = dom.historyLog.scrollHeight;
     }
 
-    addHint(hintText){
+    addHint(hintText) {
         const dom = this.domElements;
         dom.macromatrixHintDiv.textContent = `[Macromatrix]: ${hintText}`;
         dom.macromatrixHintDiv.style.display = "block";
@@ -281,9 +325,9 @@ export default class UI {
     getCssVariable(varName) {
         return window.getComputedStyle(document.body)
             .getPropertyValue(varName);
-    } 
+    }
 
-    showAreaInfo(){
+    showAreaInfo() {
         const dom = this.domElements;
         const areaInfo = AREAS[this.context.state.area];
         const zoneColor =

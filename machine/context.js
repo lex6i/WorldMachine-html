@@ -19,7 +19,7 @@ export default class Context {
     /*
     Button clicks
     */
-    initialize(){
+    async initialize(){
         const state = this.state;
         const ui = this.ui;
         
@@ -170,6 +170,7 @@ export default class Context {
                 ["hint"],
                 20
             );
+            ui.updateMatrixAnimation(AREAS[state.area].cssColorVar);
         }
 
         const question = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
