@@ -1,10 +1,11 @@
-import { AsciiAnimation, MatrixAnimation } from "./animations.js";
+import { AsciiAnimation, MatrixAnimation } from "./UI/Animation.js";
 
-export default class UI {
+export default class UIManager {
     constructor(context) {
         this.context = context;
         this.textSpeed = context.settings.textSpeed;
         this.loadDomElements();
+
         this.updateStatus();
         this.updateButtons();
         this.addListeners();
@@ -21,15 +22,15 @@ export default class UI {
 
         dom.consoleOutput = document.getElementById("console-output");
         dom.btnInitialize = document.getElementById("btn-initialize");
-        dom.btnArea = document.getElementById("btn-area");
+        dom.btnZone = document.getElementById("btn-area");
         dom.btnQuestion = document.getElementById("btn-question");
         dom.btnHint = document.getElementById("btn-hint");
         dom.statusSystem = document.getElementById("status-system");
-        dom.statusArea = document.getElementById("status-area");
+        dom.statusZone = document.getElementById("status-area");
         dom.statusMode = document.getElementById("status-mode");
         dom.counterRounds = document.getElementById("counter-rounds");
-        dom.currentAreaDiv = document.getElementById("current-area");
-        dom.areaDescriptionDiv = document.getElementById("area-description");
+        dom.currentZoneDiv = document.getElementById("current-area");
+        dom.zoneDescriptionDiv = document.getElementById("area-description");
         dom.macromatrixHintDiv = document.getElementById("macromatrix-hint");
         dom.historyLog = document.getElementById("history-log");
         dom.asciiAnimationDiv = document.getElementById("ascii-animation");
@@ -45,8 +46,8 @@ export default class UI {
         const dom = this.domElements;
         dom.consoleOutput.innerHTML = "";
         dom.historyLog.innerHTML = "";
-        dom.currentAreaDiv.style.display = "none";
-        dom.areaDescriptionDiv.style.display = "none";
+        dom.currentZoneDiv.style.display = "none";
+        dom.zoneDescriptionDiv.style.display = "none";
         dom.macromatrixHintDiv.style.display = "none";
         dom.matrixData.innerHTML = "";
     }
@@ -61,23 +62,23 @@ export default class UI {
         const context = this.context;
 
         dom.btnInitialize.addEventListener("click", () => {
-            context.initialize();
+            this.btnInit();
         });
-        dom.btnArea.addEventListener("click", () => {
-            context.generateZone();
+        dom.btnZone.addEventListener("click", () => {
+            this.btnGenZone();
         });
         dom.btnQuestion.addEventListener("click", () => {
-            context.generateQuestions();
+            this.btnGenQuest();
         });
         dom.btnHint.addEventListener("click", () => {
-            context.generateHint();
+            this.btnGenHint();
         });
-        dom.matrixSubmit.addEventListener("click", function(){
-            context.addMatrixData(dom.matrixInput.value.trim()); 
+        dom.matrixSubmit.addEventListener("click", () =>{
+            this.btnAddUserData(dom.matrixInput.value.trim()); 
         });
-        dom.matrixInput.addEventListener("keypress", function(e){
+        dom.matrixInput.addEventListener("keypress", (e) =>{
             if(e.key === "Enter"){
-                context.addMatrixData(dom.matrixInput.value.trim()); 
+                this.btnAddUserData(dom.matrixInput.value.trim()); 
             }
         });
     }
@@ -86,7 +87,7 @@ export default class UI {
     UI Updates
     ====*/
 
-    updateUI(buttons=false){
+    update(buttons=false){
         this.updateStatus();
         this.updateButtons(buttons);
     }
@@ -95,28 +96,28 @@ export default class UI {
     updateStatus() {
         const dom = this.domElements;
         const state = this.context.state;
-        const area = state.area;
+        const zone = state.zone;
         const mode = state.mode;
         // Toggle status indicators
         dom.statusSystem.classList.toggle("active", state.initialized);
-        dom.statusArea.classList.toggle("active", !!state.area);
+        dom.statusZone.classList.toggle("active", !!state.zone);
         dom.statusMode.classList.toggle("active", !!state.mode);
 
         // Update area name
-        const areaNameSpan = dom.statusArea.nextElementSibling;
-        if(!!area){
-            areaNameSpan.textContent = `Zone: ${AREAS[area].name}`;
-            areaNameSpan.style.color = this.getCssVariable(AREAS[area].cssColorVar) || "var(--area-color)";
+        const zoneNameSpan = dom.statusZone.nextElementSibling;
+        if(!!zone){
+            zoneNameSpan.textContent = `Zone: ${zone.name}`;
+            zoneNameSpan.style.color = this.getCssVariable(zone.cssColorVar) || "var(--area-color)";
         } else {
-            areaNameSpan.textContent = "Active Zone";
-            areaNameSpan.style.color = "var(--text-color)";
+            zoneNameSpan.textContent = "Active Zone";
+            zoneNameSpan.style.color = "var(--text-color)";
         }
         
         // Update mode name
         const modeNameSpan = dom.statusMode.nextElementSibling;
         if(!!mode){
-            modeNameSpan.textContent = `Mode: ${MODES[mode].name}`;
-            modeNameSpan.style.color = mode === "ZERO_GRAVITY" ? "var(--highlight-color)" : "var(--mode-color)";
+            modeNameSpan.textContent = `Mode: ${mode.name}`;
+            modeNameSpan.style.color = mode.name === "ZERO_GRAVITY" ? "var(--highlight-color)" : "var(--mode-color)";
         } else {
             modeNameSpan.textContent = "Machine Mode";
             modeNameSpan.style.color = "var(--text-color)";
@@ -125,48 +126,51 @@ export default class UI {
         // Update rounds counter
         if(
             state.initialized && 
-            state.area && 
-            state.mode !== "ZERO_GRAVITY"
+            state.zone && 
+            state.mode &&
+            state.mode.name !== "ZERO_GRAVITY"
         ){
-            dom.counterRounds.textContent = `Rounds: ${state.round}/${this.context.settings.maxRounds}`;
+            dom.counterRounds.textContent = `Rounds: ${state.round}/${state.event.rounds}`;
             dom.counterRounds.style.display = "block";
         } else {
             dom.counterRounds.style.display = "none";
         }
     }
 
-    updateButtons(isLoading = false) {
+    updateButtons() {
         const dom = this.domElements;
         const state = this.context.state;
         const settings = this.context.settings;
+        
+        const isLoading = this.context.isLoading;
 
         // Conditions
-        const isMaxRounds = state.round >= settings.maxRounds;
+        const isMaxRounds = state.event ? state.round >= state.event.rounds : false;
         const isZeroGravity = state.mode === "ZERO_GRAVITY";
 
         // Update button states
         dom.btnInitialize.disabled = state.initialized;
-        dom.btnArea.disabled = 
+        dom.btnZone.disabled = 
             !state.initialized || 
-            (isZeroGravity && !state.zeroGravityQuestionsAsked) ||
-            (!!state.area && !isMaxRounds) ||
+            (isZeroGravity && state.round >= state.event.rounds) ||
+            (!!state.zone && !isMaxRounds) ||
             isLoading;
 
         dom.btnQuestion.disabled = 
             !state.initialized || 
             isZeroGravity || 
             isMaxRounds || 
-            !state.area ||
+            !state.zone ||
             isLoading;
         dom.btnHint.disabled = 
             !state.initialized || 
             isZeroGravity || 
             isMaxRounds || 
-            !state.area ||
+            !state.zone ||
             isLoading;
         }
 
-    async updateConsole(text, prompt="", classes=[]){
+    async updateConsole(text, type=ConsoleType.Text, classes=[], addToHistory=true){
         const line = document.createElement("div");
         const promptSpan = document.createElement("span");
         const textSpan = document.createElement("span");
@@ -174,8 +178,17 @@ export default class UI {
         line.classList.add("console-line");
         classes.forEach((cls) => line.classList.add(cls));
 
+        let promptChar = "";
+        switch(type){
+            case ConsoleType.Question:
+                promptChar = "?";
+                break;
+            default:
+                promptChar = ">";
+        }
+
         promptSpan.classList.add("console-prompt");
-        promptSpan.textContent = prompt;
+        promptSpan.textContent = promptChar;
         line.appendChild(promptSpan);
 
         textSpan.classList.add("console-text");
@@ -193,6 +206,9 @@ export default class UI {
 
         textSpan.classList.remove("typing");
         line.classList.add("finished-typing");
+
+        // Add to history
+        if(addToHistory) this.addToHistory(type, text);
     }
 
 
@@ -201,24 +217,40 @@ export default class UI {
         const context = this.context;
         const state = context.state;
         
+
         //Pick Color
         let badgeColor =
-            state.mode === "ZERO_GRAVITY" ?
+            state.zone === null ||
+            state.mode === MODES.ZERO_GRAVITY ?
                 "--highlight-color" :
-                AREAS[state.area].cssColorVar;
+                state.zone.cssColorVar;
+
+        let badgeText = "";
+
+        console.log(type);
 
         switch (type) {
-            case "QUESTION":
-                content = `[${MODES[state.mode].name}] ${content}`;
+            case ConsoleType.Question:
+                content = `[${state.mode.name}] ${content}`;
+                badgeText = "Question";
                 break;
-            case "HINT":
+            case ConsoleType.Zone:
+                badgeText = "Zone";
+                break;
+            case ConsoleType.Mode:
+                badgeText = "Mode";
+                break;
+            case ConsoleType.Hint:
                 badgeColor = "--secondary-color";
+                badgeText = "Hint";
                 break;
-            case "SYSTEM":
+            case ConsoleType.System:
                 badgeColor = "--text-color";
+                badgeText = "System";
                 break;
-            case "MATRIX":
+            case ConsoleType.Matrix:
                 badgeColor = "--matrix-color";
+                badgeText = "Matrix";
                 break;
         }
 
@@ -226,7 +258,7 @@ export default class UI {
         //Create badge
         const badge = document.createElement("span");
         badge.classList.add("category-badge");
-        badge.textContent = type;
+        badge.textContent = badgeText;
         badge.style.backgroundColor = `var(${badgeColor})`;
 
         badgeColor = this.getCssVariable(badgeColor);
@@ -271,9 +303,38 @@ export default class UI {
         const dom = this.domElements;
         dom.macromatrixHintDiv.textContent = `[Macromatrix]: ${hintText}`;
         dom.macromatrixHintDiv.style.display = "block";
-        this.addToHistory("HINT", hintText);
+        this.addToHistory(ConsoleType.Hint, hintText);
     }
 
+    
+    /*====
+    Button Handlers
+    ====*/
+
+    btnInit(){
+        const state = this.context.state;
+
+        if(state.initialized) return;
+
+        state.initialized = true;
+        this.context.eventProcessor.loadNext();
+    }
+
+    btnGenZone(){
+        this.context.eventProcessor.loadNext();
+    }
+
+    btnGenQuest(){
+        this.context.state.wait = false;
+    }
+
+    btnGenHint(){
+        this.context.generateHint();
+    }
+
+    btnAddUserData(text){
+        this.context.addUserData(text);
+    }
 
     /*====
     Utility
@@ -285,16 +346,16 @@ export default class UI {
 
     showAreaInfo(){
         const dom = this.domElements;
-        const areaInfo = AREAS[this.context.state.area];
+        const zoneInfo = this.context.state.zone;
         const zoneColor =
-            this.getCssVariable(areaInfo.cssColorVar) || "var(--area-color)";
+            this.getCssVariable(zoneInfo.cssColorVar) || "var(--area-color)";
 
-        dom.currentAreaDiv.textContent = `Current Zone: ${areaInfo.name}`;
-        dom.currentAreaDiv.style.borderColor = zoneColor;
-        dom.currentAreaDiv.style.display = "block";
+        dom.currentZoneDiv.textContent = `Current Zone: ${zoneInfo.name}`;
+        dom.currentZoneDiv.style.borderColor = zoneColor;
+        dom.currentZoneDiv.style.display = "block";
 
-        dom.areaDescriptionDiv.textContent = `Description: ${areaInfo.description}`;
-        dom.areaDescriptionDiv.style.borderColor = zoneColor;
-        dom.areaDescriptionDiv.style.display = "block";
+        dom.zoneDescriptionDiv.textContent = `Description: ${zoneInfo.description}`;
+        dom.zoneDescriptionDiv.style.borderColor = zoneColor;
+        dom.zoneDescriptionDiv.style.display = "block";
     }
 }
