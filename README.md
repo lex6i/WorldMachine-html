@@ -23,3 +23,6 @@ That's it! The site should now be running locally on your machine.
 - [ ] Implement Basic Questions
 - [ ] Add API for LLM
 - [ ] Create a secondary question class for the ai mode
+- [ ] Add Repeats to scripting
+- [ ] Document scripting paramaters
+- [ ] Switch EventContainer to use automatic indexing
