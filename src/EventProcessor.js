@@ -19,26 +19,31 @@ export default class EventProcessor {
 
     // Get the next action from the event queue
     getEvent(){
+        // Check if waiting for input
         if(this.context.state.wait) return new Action(ActionType.Wait);
 
+        // Check if the event is complete
         if(this.pollEvent()) return new Action(ActionType.Wait);
 
-        const state = this.context.state;
+        // Check if the event is a text event
+        const state = this.context.state;  // Must happen after pollEvent
         if(state.event.text != null){
             return new Action(ActionType.Text, state.event.text[state.round]);
         }
-        console.log(state.event.zone, state.zone);
-        if(state.zone == null && state.event.zone != null){ // Zone change
+
+        // Check if the zone is unset - Implies a zone change
+        if(state.zone == null && state.event.zone != null){
             this.context.state.wait = true;
             return new Action(ActionType.Zone, state.event.zone);
         }
 
-        if(state.mode == null ){ // Mode change
-            //if(state.event.mode != MODES.ZERO_GRAVITY) this.context.state.wait = true;
+        // Check if the mode is unset - Implies a mode change
+        // TODO: Add option to change mode every question or not
+        if(state.mode == null){
+            this.context.state.wait = true;
             return new Action(ActionType.Mode, state.event.mode);
         }
         
-        //if(state.mode != MODES.ZERO_GRAVITY) return new Action(ActionType.Wait);
         // Get a question
         const question = this.questionMananger.getQuestion();
         if(question == null) {
@@ -47,9 +52,6 @@ export default class EventProcessor {
         }
         state.round++;
         return new Action(ActionType.Question, question);
-
-        console.log("No action");
-        return new Action(ActionType.Wait);
     }
 
     // Check if the current event is complete

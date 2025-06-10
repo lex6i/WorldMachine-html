@@ -4,7 +4,7 @@ import Context from "./src/Context.js";
 class WorldMachine {
     constructor() {
         this.context = new Context({
-            fps: 25,
+            useLLM: false,
             textSpeed: 25
         });
     }
