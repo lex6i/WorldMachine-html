@@ -1,6 +1,6 @@
 # WorldMachine-html
  
-## How to Run
+## Simple Local http server
 
 1. Make sure you have Python 3 installed on your system
 2. Navigate to the project directory in your terminal
