@@ -5,7 +5,7 @@ class WorldMachine {
     constructor() {
         this.context = new Context({
             useLLM: false,
-            textSpeed: 1,
+            textSpeed: 25,
         });
     }
 }
