@@ -1,3 +1,28 @@
+// Load Questions from server (find better place for this code)
+let QUESTIONS = {};
+let HINTS = [];
+
+async function loadQuestions(){
+    try {
+        const response = await fetch(`https://wmadmin.glitch.me/data`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        data = await response.json();
+        console.log(data);
+
+        QUESTIONS = data.QUESTIONS;
+        HINTS = data.HINTS;
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+loadQuestions();
+
+
+/*
 const HINTS = [
     "Pay attention to subtle changes...",
     "History hides more...",
@@ -320,7 +345,10 @@ const QUESTIONS = {
         "What does a time gap look like that was created by an understatement?",
         "What happens when the boundaries between one's own time and another's disappear?",
         "What does a space look like that was never created but already exists?",
-        "What does time do when no one uses it?",
+        "What does time do when no one uses it?",document.addEventListener("DOMContentLoaded", async () => {
+    await loadQuestions();
+    worldMachine = new WorldMachine();
+});
         "What does the sound sound like that shifts a moment into the future?",
       ],
     },
@@ -532,4 +560,4 @@ const QUESTIONS = {
         "What will you feel when you discover that your feelings were a beautiful accident all along?",
       ],
     },
-  };
+  };*/
