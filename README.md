@@ -23,3 +23,4 @@ That's it! The site should now be running locally on your machine.
 - [ ] Implement Basic Questions
 - [ ] Add API for LLM
 - [ ] Create a secondary question class for the ai mode
+- [ ] Add logic to make sure there is enough questions for normal mode
