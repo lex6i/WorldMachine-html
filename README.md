@@ -1,4 +1,5 @@
 # WorldMachine-html
+ Code for the WorldMachine by Eternal Engine
  
 ## Simple Local http server
 
