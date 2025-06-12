@@ -35,6 +35,7 @@ export default class Context {
             basic: 0,
             repeat: 0,
             wait: false,
+            modeChange: true,
         }
     }
 
@@ -75,8 +76,8 @@ export default class Context {
                 this.ui.update();
                 await this.ui.updateConsole(action.data, ConsoleType.Question);
                 if (this.state.mode != MODES.ZERO_GRAVITY){ 
-                    this.state.mode = null;
                     this.state.wait = true;
+                    console.log("Waiting for mode");
                 }
                 this.isLoading = false;
                 break;

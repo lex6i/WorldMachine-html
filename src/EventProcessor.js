@@ -37,20 +37,38 @@ export default class EventProcessor {
             return new Action(ActionType.Zone, state.event.zone);
         }
 
+        // Check if the basic questions are complete
+        if(state.mode != MODES.ZERO_GRAVITY && state.event.basicQuestions > state.basic){
+            state.mode = "BASIC";
+            state.basic += 1; 
+            console.log("Getting basic question");
+            const question = this.questionMananger.getBasicQuestion();
+            if(question == null) {
+                console.log("No questions");
+                return new Action(ActionType.Wait);
+            }
+            state.round++;
+            return new Action(ActionType.Question, question);
+        }
+
         // Check if the mode is unset - Implies a mode change
         // TODO: Add option to change mode every question or not
-        if(state.mode == null){
+        if(state.modeChange){
+            state.modeChange = false;
             //this.context.state.wait = true;
             return new Action(ActionType.Mode, state.event.mode);
         }
+
         
-        // Get a question
+
+        // Return a question
         const question = this.questionMananger.getQuestion();
         if(question == null) {
             console.log("No questions");
             return new Action(ActionType.Wait);
         }
         state.round++;
+        if(state.mode != MODES.ZERO_GRAVITY) state.modeChange = true;
         return new Action(ActionType.Question, question);
     }
 

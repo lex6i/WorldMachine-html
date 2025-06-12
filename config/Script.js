@@ -23,10 +23,10 @@ const SCRIPT = {
     },
     3: {
         type: BlockType.Question,
-        zone: ZONES.RANDOM,
+        zone: ZONES.ENVIRONMENT,
         mode: MODES.RANDOM,
-        rounds: 2,
-        basicQuestions: 3,
+        rounds: 5,
+        basicQuestions: 2,
     },
     4: {
         type: BlockType.Question,

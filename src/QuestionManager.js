@@ -42,6 +42,14 @@ export default class QuestionManager {
         return question;
     } 
 
+    getBasicQuestion(){
+        const zone = this.getKey("ZONE", this.context.state.zone.name);
+
+        const questionPool = QUESTIONS[zone].BASIC;
+
+        return questionPool[Math.floor(Math.random() * questionPool.length)];
+    }
+
     getQuestionPool(){
         const zoneKey = this.context.state.zone == null? null : this.getKey("ZONE", this.context.state.zone.name);
         const modeKey = this.getKey("MODE", this.context.state.mode.name);

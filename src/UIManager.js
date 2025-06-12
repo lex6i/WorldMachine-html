@@ -116,7 +116,7 @@ export default class UIManager {
         // Update mode name
         const modeNameSpan = dom.statusMode.nextElementSibling;
         if(!!mode){
-            modeNameSpan.textContent = `Mode: ${mode.name}`;
+            modeNameSpan.textContent = mode === "BASIC" ? "Mode: Basic" : `Mode: ${mode.name}`;
             modeNameSpan.style.color = mode.name === "ZERO_GRAVITY" ? "var(--highlight-color)" : "var(--mode-color)";
         } else {
             modeNameSpan.textContent = "Machine Mode";
