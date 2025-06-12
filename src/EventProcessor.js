@@ -24,7 +24,7 @@ export default class EventProcessor {
 
         // Check if the event is complete
         if(this.pollEvent()) return new Action(ActionType.Wait);
-
+        console.log("poll");
         // Check if the event is a text event
         const state = this.context.state;  // Must happen after pollEvent
         if(state.event.text != null){
@@ -40,7 +40,7 @@ export default class EventProcessor {
         // Check if the mode is unset - Implies a mode change
         // TODO: Add option to change mode every question or not
         if(state.mode == null){
-            this.context.state.wait = true;
+            //this.context.state.wait = true;
             return new Action(ActionType.Mode, state.event.mode);
         }
         

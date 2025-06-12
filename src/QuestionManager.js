@@ -25,7 +25,7 @@ export default class QuestionManager {
     getQuestion(){
         const state = this.context.state;
         const questionPool = this.getQuestionPool();
-
+        console.log(questionPool);
 
         // Get a random question
         const question = questionPool[Math.floor(Math.random() * questionPool.length)];
